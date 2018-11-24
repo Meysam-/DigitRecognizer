@@ -1,0 +1,5 @@
+numpy
+tensorflow==1.5
+keras
+pandas
+sklearn
