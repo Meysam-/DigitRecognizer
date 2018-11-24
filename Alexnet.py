@@ -8,10 +8,9 @@ from sklearn import preprocessing
 
 
 class Alexnet:
-    def __init__(self, X_train, Y_train):
+    def __init__(self):
         np.random.seed(1000)
-        self.X_train = X_train
-        self.Y_train = Y_train
+
         self.model = self.create_model()
         self.compile_model()
 
@@ -73,9 +72,12 @@ class Alexnet:
     def compile_model(self):
         self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
-    def train(self):
+    def train(self, X_train, Y_train):
         self.model.fit(self.X_train, self.Y_train, batch_size=64, epochs=1, verbose=1,
                        validation_split=0.2, shuffle=True)
+
+    def predict(self, X_test):
+        return self.model.predict_classes(X_test, verbose=1)
 
     def save(self):
         self.model.save_weights("weights/alexnet-weights.h5")
@@ -100,8 +102,14 @@ if __name__ == "__main__":
     lb = preprocessing.LabelBinarizer()
     Y_train = lb.fit_transform(Y_train)
 
-    X_test = test.reshape()
+    X_test = test.reshape(test.shape[0], 28, 28, 1)
 
-    alexnet = Alexnet(X_train, Y_train)
+    alexnet = Alexnet()
+    # alexnet.train(X_train, Y_train)
+
     alexnet.load()
+
+    preds = alexnet.predict(X_test)
+    pd.DataFrame({"ImageId": list(range(1, len(preds) + 1)), "Label": preds})\
+        .to_csv("predicts.cvs", index=False, header=True)
 
