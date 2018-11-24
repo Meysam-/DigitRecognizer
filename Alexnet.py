@@ -18,17 +18,17 @@ class Alexnet:
         model = Sequential()
 
         # 1st Convolutional Layer
-        model.add(Conv2D(filters=96, input_shape=(28, 28, 1), kernel_size=(5, 5), strides=(1, 1), padding='valid'))
+        model.add(Conv2D(filters=96, input_shape=(28, 28, 1), kernel_size=(11, 11), strides=(1, 1), padding='valid'))
         model.add(Activation('relu'))
         # Pooling
-        model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2), padding='valid'))
+        # model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2), padding='valid'))
         # Batch Normalisation before passing it to the next layer
         model.add(BatchNormalization())
 
         # 2nd Convolutional Layer
-        model.add(Conv2D(filters=256, kernel_size=(3, 3), strides=(1, 1), padding='valid'))
+        model.add(Conv2D(filters=256, kernel_size=(11, 11), strides=(1, 1), padding='valid'))
         model.add(Activation('relu'))
-        model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2), padding='valid'))
+        model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1), padding='valid'))
         model.add(BatchNormalization())
 
         # 3rd Convolutional Layer
@@ -36,14 +36,19 @@ class Alexnet:
         model.add(Activation('relu'))
         model.add(BatchNormalization())
 
-        # 4th Convolutional Layer
+        # 4rd Convolutional Layer
+        model.add(Conv2D(filters=384, kernel_size=(3, 3), strides=(1, 1), padding='valid'))
+        model.add(Activation('relu'))
+        model.add(BatchNormalization())
+
+        # 5th Convolutional Layer
         model.add(Conv2D(filters=256, kernel_size=(3, 3), strides=(1, 1), padding='valid'))
         model.add(Activation('relu'))
         model.add(BatchNormalization())
 
         model.add(Flatten())
         # 1st Dense Layer
-        model.add(Dense(4096, input_shape=(224 * 224 * 3,)))
+        model.add(Dense(4096, input_shape=(28 * 28 * 1,)))
         model.add(Activation('relu'))
         # Add Dropout to prevent overfitting
         model.add(Dropout(0.4))
@@ -73,14 +78,14 @@ class Alexnet:
         self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
     def train(self, X_train, Y_train):
-        self.model.fit(self.X_train, self.Y_train, batch_size=64, epochs=1, verbose=1,
+        self.model.fit(X_train, Y_train, batch_size=64, epochs=1, verbose=1,
                        validation_split=0.2, shuffle=True)
 
     def predict(self, X_test):
         return self.model.predict_classes(X_test, verbose=1)
 
     def save(self):
-        self.model.save_weights("weights/alexnet-weights.h5")
+        self.model.save_weights("weights/alexnet-weights9.h5")
 
     def load(self):
         self.model.load_weights("weights/alexnet-weights.h5")
@@ -106,6 +111,7 @@ if __name__ == "__main__":
 
     alexnet = Alexnet()
     # alexnet.train(X_train, Y_train)
+    # alexnet.save()
 
     alexnet.load()
 
